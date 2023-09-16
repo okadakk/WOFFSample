@@ -28,9 +28,12 @@ app.get('/', async (req, res) => {
     console.log(body);
     const url = process.env.FOLLOW_URL || 'http://localhost:3000/follow';
     res.send(body.contacts.map(c => {
+      console.log(c.linkedExternalUser);
+      console.log(c.linkedExternalUser.buddyUserIds);
       return {
         name: c.contactName.lastName + c.contactName.firstName,
-        code: c.contactId,
+        contact: c.contactId,
+        linked: c.linkedExternalUser.id,
         url: `${url}&code=${c.contactId}`
       }
     }));
