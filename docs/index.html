@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOFF アプリ サンプル</title>
+    <script>
+        // WOFF アプリ ID を設定する
+        const woffId = "CtaGJGrgyRIT77MtzHo0tA"
+    </script>
+    <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        var vConsole = new window.VConsole();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+        :root {
+            --fluorescent-green: #66ff00;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #09c6f9, #045de9);
+            color: #e0e0e0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+
+        .section {
+            background-color: rgba(10, 10, 10, 0.5);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--fluorescent-green);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .btn {
+            display: block;
+            margin: 20px 0;
+            padding: 15px 30px;
+            background-color: transparent;
+            color: #00c6ff;
+            text-align: center;
+            border: 2px solid #00c6ff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            align-self: center;
+            font-size: 18px;
+        }
+
+
+        .btn:hover {
+            background-color: var(--fluorescent-green);
+            color: #020b2e;
+        }
+
+        #sendLocationBtn,
+        #sendQRDataBtn {
+            display: none;
+        }
+
+        #sendQRBtn {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>WOFF アプリ サンプル</h1>
+    </header>
+
+    <div class="container">
+        <!-- QRコードリーダーのセクション -->
+        <div class="section">
+            <h2>配信対象</h2>
+            <div id="qrResult"></div>
+        </div>
+        <!-- アプリ終了のセクション -->
+        <div class="section">
+            <h2>アプリを終了する</h2>
+            <p>woff.closeWindow() メソッドで WOFF アプリを終了します。</p>
+            <button class="btn" id="exitAppBtn">アプリを終了</button>
+        </div>
+    </div>
+
+    <script>
+        async function getMessage() {
+            const accessToken = woff.isLoggedIn() ? woff.getAccessToken() : 'testToken';
+
+            const results = await fetch('https://woff-sample.onrender.com', {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                }
+            });
+            const messageList = await results.json();
+
+            const qrResultElem = document.getElementById("qrResult");
+            qrResultElem.innerHTML = messageList.map(message => {
+                return `<div><button class="btn" onclick="sendMessage('${message.url}')">${message.name}さんに送信<br>(ID: ${message.code})</button></div>`;
+            }).join('');
+        }
+
+        async function sendMessage(url) {
+            woff.sendMessage({
+                content: url
+            })
+            .then(() => {
+                alert('Sent successfully');
+            })
+            .catch((err) => {
+                alert('error: ' + err);
+            });
+        }
+
+        document.getElementById("exitAppBtn").addEventListener("click", function () {
+            woff.closeWindow();
+        });
+
+        window.onload = function () {
+            woff
+                .init({
+                    woffId: woffId
+                })
+                .then(async () => {
+                    await getMessage();
+                })
+                .catch((err) => {
+                    console.log(err.code, err.message);
+                });
+        };
+    </script>
+    <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6/sdk.js"></script>
+</body>
+
+</html>
