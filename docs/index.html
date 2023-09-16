@@ -132,16 +132,12 @@
                 content: url
             })
             .then(() => {
-                alert('Sent successfully');
+                woff.closeWindow();
             })
             .catch((err) => {
                 alert('error: ' + err);
             });
         }
-
-        document.getElementById("exitAppBtn").addEventListener("click", function () {
-            woff.closeWindow();
-        });
 
         window.onload = function () {
             woff
